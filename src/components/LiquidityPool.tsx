@@ -2,15 +2,11 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useStore } from "@/store/useStore";
+import { useDerivedStats } from "@/store/useStore";
 import { formatNumber } from "@/utils/format";
 
 export default function LiquidityPool() {
-  const transactions = useStore((s) => s.transactions);
-  const totalLiquidityReinforced = useStore((s) => s.totalLiquidityReinforced());
-  const totalBuybacks = useStore((s) => s.totalBuybacks());
-  const liquidityDepth = useStore((s) => s.liquidityDepth());
-
+  const { totalLiquidityReinforced, totalBuybacks, liquidityDepth, transactions } = useDerivedStats();
   const fillPercent = Math.min(100, liquidityDepth);
 
   return (

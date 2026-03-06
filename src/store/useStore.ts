@@ -5,7 +5,6 @@ interface PoolState {
   transactions: Transaction[];
   flywheelSpeed: number;
   agentActive: boolean;
-  lastSyncedIds: Set<string>;
 
   setTransactions: (txs: Transaction[]) => void;
   syncFromServer: () => Promise<void>;
@@ -13,18 +12,12 @@ interface PoolState {
   resetAll: () => Promise<void>;
   setFlywheelSpeed: (speed: number) => void;
   setAgentActive: (active: boolean) => void;
-
-  // Derived
-  totalLiquidityReinforced: () => number;
-  totalBuybacks: () => number;
-  liquidityDepth: () => number;
 }
 
 export const useStore = create<PoolState>((set, get) => ({
   transactions: [],
   flywheelSpeed: 1,
   agentActive: false,
-  lastSyncedIds: new Set<string>(),
 
   setTransactions: (txs) => set({ transactions: txs }),
 
@@ -33,9 +26,16 @@ export const useStore = create<PoolState>((set, get) => ({
       const res = await fetch("/api/transactions");
       if (!res.ok) return;
       const txs: Transaction[] = await res.json();
-      set({ transactions: txs });
+      // Only update if data actually changed (compare length + first id)
+      const current = get().transactions;
+      if (
+        txs.length !== current.length ||
+        (txs.length > 0 && current.length > 0 && txs[0].id !== current[0].id)
+      ) {
+        set({ transactions: txs });
+      }
     } catch {
-      // silent fail on network error
+      // silent
     }
   },
 
@@ -46,28 +46,27 @@ export const useStore = create<PoolState>((set, get) => ({
       body: JSON.stringify(tx),
     });
     if (!res.ok) return;
-    // Re-fetch full list to stay in sync
-    await get().syncFromServer();
+    const newTx: Transaction = await res.json();
+    // Immediately update local state so UI reacts instantly
+    set((state) => ({ transactions: [newTx, ...state.transactions] }));
   },
 
   resetAll: async () => {
     await fetch("/api/reset", { method: "POST" });
-    set({
-      transactions: [],
-      flywheelSpeed: 1,
-      agentActive: false,
-    });
+    set({ transactions: [], flywheelSpeed: 1, agentActive: false });
   },
 
   setFlywheelSpeed: (speed) => set({ flywheelSpeed: speed }),
   setAgentActive: (active) => set({ agentActive: active }),
-
-  totalLiquidityReinforced: () =>
-    get().transactions.reduce((sum, t) => sum + t.amount, 0),
-  totalBuybacks: () => get().transactions.length,
-  liquidityDepth: () =>
-    Math.min(
-      100,
-      get().transactions.reduce((sum, t) => sum + t.amount / 50000, 0)
-    ),
 }));
+
+// Helper hooks that derive values from transactions
+export function useDerivedStats() {
+  const transactions = useStore((s) => s.transactions);
+  const totalLiquidityReinforced = transactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalBuybacks = transactions.length;
+  const liquidityDepth = Math.min(100, transactions.reduce((sum, t) => sum + t.amount / 50000, 0));
+  const avgBuyback = totalBuybacks > 0 ? totalLiquidityReinforced / totalBuybacks : 0;
+
+  return { totalLiquidityReinforced, totalBuybacks, liquidityDepth, avgBuyback, transactions };
+}

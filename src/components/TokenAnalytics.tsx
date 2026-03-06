@@ -2,18 +2,11 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useStore } from "@/store/useStore";
+import { useDerivedStats } from "@/store/useStore";
 import { formatNumber } from "@/utils/format";
 
 export default function TokenAnalytics() {
-  const transactions = useStore((s) => s.transactions);
-  const totalBuybacks = useStore((s) => s.totalBuybacks());
-  const totalLiquidityReinforced = useStore((s) => s.totalLiquidityReinforced());
-
-  const avgBuyback =
-    transactions.length > 0
-      ? transactions.reduce((sum, t) => sum + t.amount, 0) / transactions.length
-      : 0;
+  const { totalBuybacks, totalLiquidityReinforced, avgBuyback, transactions } = useDerivedStats();
 
   const efficiency = transactions.length > 0 ? "97.3%" : "--";
 

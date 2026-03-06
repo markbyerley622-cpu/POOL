@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
+export const dynamic = "force-dynamic";
+
 const DATA_FILE = path.join(process.cwd(), "data", "transactions.json");
 
 function ensureDataDir() {
@@ -31,7 +33,11 @@ function writeTransactions(txs: unknown[]) {
 
 export async function GET() {
   const txs = readTransactions();
-  return NextResponse.json(txs);
+  return NextResponse.json(txs, {
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+    },
+  });
 }
 
 export async function POST(request: Request) {
@@ -39,8 +45,8 @@ export async function POST(request: Request) {
   const tx = {
     id: crypto.randomUUID(),
     wallet: body.wallet,
-    amount: body.amount,
-    token: body.token,
+    amount: Number(body.amount),
+    token: body.token || "POOL",
     txid: body.txid,
     timestamp: Date.now(),
     message: body.message || undefined,
