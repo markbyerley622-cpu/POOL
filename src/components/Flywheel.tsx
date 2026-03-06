@@ -16,7 +16,12 @@ export default function Flywheel() {
   const duration = Math.max(2, 20 / flywheelSpeed);
 
   return (
-    <div className="relative flex flex-col items-center">
+    <motion.div
+      className="relative flex flex-col items-center"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
       <h2 className="text-lg font-bold text-electric-cyan mb-4 font-mono">
         Liquidity Flywheel
       </h2>
@@ -94,6 +99,6 @@ export default function Flywheel() {
           </span>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -27,7 +27,12 @@ export default function TelemetryPanel() {
   }, []);
 
   return (
-    <div className="p-4 rounded-xl border border-neon-purple/20 bg-neon-purple/5 backdrop-blur">
+    <motion.div
+      className="p-4 rounded-xl border border-neon-purple/20 bg-neon-purple/5 backdrop-blur"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
       <h3 className="text-sm font-bold text-neon-purple font-mono mb-3">
         Agent Telemetry
       </h3>
@@ -52,6 +57,6 @@ export default function TelemetryPanel() {
           </motion.div>
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 }

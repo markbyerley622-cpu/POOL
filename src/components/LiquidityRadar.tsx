@@ -10,7 +10,12 @@ const SIGNALS = [
 
 export default function LiquidityRadar() {
   return (
-    <div className="p-4 rounded-xl border border-electric-cyan/20 bg-electric-cyan/5 backdrop-blur flex flex-col items-center">
+    <motion.div
+      className="p-4 rounded-xl border border-electric-cyan/20 bg-electric-cyan/5 backdrop-blur flex flex-col items-center"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+    >
       <h3 className="text-sm font-bold text-electric-cyan font-mono mb-3">
         Liquidity Radar
       </h3>
@@ -84,6 +89,6 @@ export default function LiquidityRadar() {
           </span>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

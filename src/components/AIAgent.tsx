@@ -7,7 +7,12 @@ export default function AIAgent() {
   const agentActive = useStore((s) => s.agentActive);
 
   return (
-    <div className="relative flex flex-col items-center">
+    <motion.div
+      className="relative flex flex-col items-center"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
       <h2 className="text-lg font-bold text-electric-cyan mb-4 font-mono">
         Liquidity Agent
       </h2>
@@ -79,6 +84,6 @@ export default function AIAgent() {
       >
         {agentActive ? "EXECUTING BUYBACK" : "MONITORING"}
       </motion.p>
-    </div>
+    </motion.div>
   );
 }

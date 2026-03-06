@@ -41,7 +41,12 @@ export default function DecisionEngine() {
   }, []);
 
   return (
-    <div className="p-4 rounded-xl border border-neon-blue/20 bg-neon-blue/5 backdrop-blur">
+    <motion.div
+      className="p-4 rounded-xl border border-neon-blue/20 bg-neon-blue/5 backdrop-blur"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+    >
       <h3 className="text-sm font-bold text-neon-blue font-mono mb-3">
         Decision Engine
       </h3>
@@ -71,6 +76,6 @@ export default function DecisionEngine() {
           ))}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
